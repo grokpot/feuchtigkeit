@@ -11,8 +11,8 @@ WLAN_SSID =
 WLAN_PW = 
 
 # Not sensitive
-
 DEBUG = False
+TEST = False
 PIN_OUT = 32
 PIN_IN = 34
 
@@ -63,7 +63,7 @@ def _ss(data):
     return ss
 
 
-def stddev(data, ddof=0):
+def stdev(data, ddof=0):
     """
     MicroPy doesn't have statistics library, so we need this
     Calculates the population standard deviation by default; specify ddof=1 to compute the sample standard deviation.
@@ -118,7 +118,7 @@ def test_sensor_reading(adc, pin_out):
                 "| Mean:",
                 mean,
                 "| Relative Stdev:",
-                int(stddev(values_list) * 100 / mean),
+                int(stdev(values_list) * 100 / mean),
             )
             print()
 
@@ -137,7 +137,8 @@ def loop(mac_addr, adc, pin_out):
     while True:
         # Turn output on so ADC device gets power
         pin_out.on()
-        # TODO: Sleep to let board turn on? Measure this
+        # Wait after turning pin on for accurate value
+        time.sleep(2)
         adc_raw = adc.read()
         # Convert from 12 bit return values to scale of 0-100
         adc_percent = adc_raw * 100 / 4095
@@ -149,19 +150,28 @@ def loop(mac_addr, adc, pin_out):
             data="feuchtigkeit,device_id={} adc_value={}".format(mac_addr, adc_percent),
             headers={"Authorization": "Token {}".format(INFLUXDB_TOKEN)},
         )
-        if DEBUG:
-            print(response.status_code)
-            print(response.content)
+        if response.status_code != 204:
+            raise Exception(
+                "Bad response from InfluxDB: {}".format(response.status_code)
+            )
+
+        # Need to print these else the program fails with `mbedtls_ssl_handshake error: -4290`. No luck so far debugging it.
+        print(response.status_code)
+        print(response.content)
+
         pin_out.off()
-        time.sleep(5)
+
+        # Run every 15 mins
+        time.sleep(60 * 15)
 
 
 def main():
     mac_addr = setup_network()
     adc, pin_out = setup_pins()
-    if DEBUG:
+    if TEST:
         test_sensor_reading(adc, pin_out)
-    loop(mac_addr, adc, pin_out)
+    else:
+        loop(mac_addr, adc, pin_out)
 
 
 if __name__ == "__main__":
