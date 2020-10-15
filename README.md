@@ -1,7 +1,9 @@
+## Flash the Pyboard
+https://micropython.org/download/esp32/
 ## Rshell
 https://github.com/dhylands/rshell
 #### Connect rshell to ESP
-`rshell -p cu.usbserial-0001`
+`rshell -p /dev/cu.SLAB_USBtoUART`
 #### List contents of ESP
 (rshell) `ls -l /pyboard`
 #### REPL via Rshell
