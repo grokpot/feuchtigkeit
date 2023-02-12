@@ -54,6 +54,7 @@ def test_sensor_reading(adc, pin_out):
     Test how sensor values are affected by:
     1) Turning the sensor off (sleep after Pin off)
     2) Waiting before taking a reading (sleep after Pin on)
+    Results (similar for both types of moisture sensors)
     Pin off s: 0 | Pin on s: 0 | Mean: 289 | Relative Stdev: 18
     Pin off s: 0.5 | Pin on s: 0 | Mean: 135 | Relative Stdev: 14
     Pin off s: 1 | Pin on s: 0 | Mean: 125 | Relative Stdev: 18
@@ -66,8 +67,6 @@ def test_sensor_reading(adc, pin_out):
     Pin off s: 0 | Pin on s: 3 | Mean: 2175 | Relative Stdev: 0
     Pin off s: 0.5 | Pin on s: 3 | Mean: 2174 | Relative Stdev: 0
     Pin off s: 1 | Pin on s: 3 | Mean: 2169 | Relative Stdev: 0
-
-    It looks like
     """
     sample_size = 20
     pin_off_seconds_list = [0, 0.5, 1]
